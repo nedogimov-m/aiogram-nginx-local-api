@@ -1,8 +1,8 @@
-from aiogram import Bot
-from aiogram.types import Downloadable
-import aiohttp
 import re
+
 import aiofiles
+import aiohttp
+from aiogram import Bot
 
 
 class NginxAPIDownloader:
@@ -10,7 +10,7 @@ class NginxAPIDownloader:
         self.bot = bot
         self.url = url
 
-    async def download(self, file: str | Downloadable, destination) -> str:
+    async def download(self, file: str, destination) -> str:
         try:
             await self.bot.download(file, destination)
         except OSError as e:
