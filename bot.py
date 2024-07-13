@@ -1,6 +1,7 @@
 import asyncio
+import uuid
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
 from downloader import NginxAPIDownloader
@@ -26,6 +27,27 @@ async def simple_handler(message: types.Message, downloader: NginxAPIDownloader)
     # ...
 
 
+async def handle_document(message: types.Message, bot: Bot, downloader: NginxAPIDownloader):
+    try:
+        try:
+            file_id = message.document.file_id
+            file = await bot.get_file(file_id)
+            file_path = file.file_path
+            # file_name = uuid.uuid4().hex + '.txt'
+            # downloaded_file = await bot.download_file(file_path=file_path)
+            doc = await downloader.download(message.document, file_path)
+            text = doc.getvalue().decode()
+            """with open(downloaded_file, 'r', encoding='utf-8') as f:
+                content = f.read()"""
+            await message.reply(f'Документ прочитан, он имеет {len(text)} символов')
+            # os.remove(downloaded_file)
+        except Exception as e:
+            print(f'error while downloading: {e}')
+    except Exception as e:
+        print(e)
+        await message.reply(f'Возникла ошибка')
+
+
 async def main():
     session = AiohttpSession(api=TelegramAPIServer.from_base(config.TELEGRAM_API_URL, is_local=True))
     bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.HTML, session=session)
@@ -34,6 +56,7 @@ async def main():
 
     dp = Dispatcher(storage=storage, downloader=nginx_downloader)
     dp.message.register(simple_handler)
+    dp.message.register(handle_document, F.content_type == 'document')
 
     try:
         await bot.delete_webhook(True)
