@@ -27,19 +27,15 @@ async def simple_handler(message: types.Message, downloader: NginxAPIDownloader)
     # ...
 
 
-async def handle_document(message: types.Message, bot: Bot, downloader: NginxAPIDownloader):
+async def handle_document(message: types.Message, downloader: NginxAPIDownloader):
     try:
         try:
-            file_id = message.document.file_id
-            file = await bot.get_file(file_id)
-            file_path = file.file_path
-            # file_name = uuid.uuid4().hex + '.txt'
-            # downloaded_file = await bot.download_file(file_path=file_path)
-            doc = await downloader.download(message.document, file_path)
-            text = doc.getvalue().decode()
-            """with open(downloaded_file, 'r', encoding='utf-8') as f:
-                content = f.read()"""
-            await message.reply(f'Документ прочитан, он имеет {len(text)} символов')
+            file_name = uuid.uuid4().hex + '.txt'
+            print(file_name)
+            await downloader.download(message.document, file_name)
+            with open(file_name, 'r', encoding='utf-8') as f:
+                content = f.read()
+            await message.reply(f'Документ прочитан, он имеет {len(content)} символов')
             # os.remove(downloaded_file)
         except Exception as e:
             print(f'error while downloading: {e}')
