@@ -11,23 +11,6 @@ from aiogram.client.telegram import TelegramAPIServer
 import config
 
 
-async def simple_handler(message: types.Message, downloader: NginxAPIDownloader):
-    await message.answer("Скачиваю...")
-
-    filepath = "file.pdf"
-    await downloader.download(message.document, filepath)
-
-    downloaded_file = types.FSInputFile(filepath)
-    await message.answer_document(
-        document=downloaded_file,
-        caption="Файл успешно скачан!"
-    )
-
-    # await downloader.download(message.document, "file.txt")
-    # await downloader.download(message.photo[0].file_id, "file.jpg")
-    # ...
-
-
 async def handle_document(message: types.Message, downloader: NginxAPIDownloader):
     try:
         try:
@@ -53,7 +36,6 @@ async def main():
     nginx_downloader = NginxAPIDownloader(bot=bot, url=config.NGINX_API_URL)
 
     dp = Dispatcher(storage=storage, downloader=nginx_downloader)
-    dp.message.register(simple_handler)
     dp.message.register(handle_document, F.content_type == 'document')
 
     try:
