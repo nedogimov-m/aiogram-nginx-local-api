@@ -2,6 +2,7 @@ import asyncio
 import uuid
 
 from aiogram import Bot, Dispatcher, types, F
+from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
 from downloader import NginxAPIDownloader
@@ -46,7 +47,8 @@ async def handle_document(message: types.Message, downloader: NginxAPIDownloader
 
 async def main():
     session = AiohttpSession(api=TelegramAPIServer.from_base(config.TELEGRAM_API_URL, is_local=True))
-    bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.HTML, session=session)
+    bot = Bot(token=config.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML,
+                                                                   link_preview_is_disabled=True), session=session)
     storage = MemoryStorage()
     nginx_downloader = NginxAPIDownloader(bot=bot, url=config.NGINX_API_URL)
 
